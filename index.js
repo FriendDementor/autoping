@@ -1,6 +1,6 @@
 const http = require('http')
 const port = 3000
-const INTERVAL = 3600
+const INTERVAL = 60000
 const EOL = '\n\r'
 
 const MongoClient = require('mongodb').MongoClient
