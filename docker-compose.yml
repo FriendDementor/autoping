@@ -1,8 +1,8 @@
-version: '2'
+version: "2"
 
 services:
   app:
-    image: gvilarino/docker-testing
+    image: docker-testing
     environment:
       MONGO_URL: "mongodb://db/test"
     depends_on:
@@ -11,4 +11,4 @@ services:
       - "3000:3000"
 
   db:
-image: mongo
+    image: mongo
