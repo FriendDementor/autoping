@@ -6,6 +6,8 @@ const MongoClient = require('mongodb').MongoClient
 // Connection URL
 const mongoUrl = process.env.MONGO_URL || 'mongodb://db:27017/test';
 
+var timesLoged = 0;
+
 http.createServer((req, res) => {
   // Use connect method to connect to the Server
   MongoClient.connect(mongoUrl, (err, db) => {
@@ -14,10 +16,17 @@ http.createServer((req, res) => {
       res.end('BOOM: ' + err)
     } else {
       res.writeHead(200, {'Content-Type': 'text/plain'})
-      res.end('Me conecte a la DB!')
+      res.end('[ ' + timesLoged + ' ] segundos activo')
       db.close();
     }
   });
 }).listen(port, err => {
   console.log('Server listening at *:', port)
 });
+
+
+function intervalFunc() {
+  timesLoged+=1;
+}
+
+setInterval(intervalFunc, 1000);
