@@ -1,12 +1,16 @@
 const http = require('http')
 const port = 3000
+const INTERVAL = 3600
+const EOL = '\n\r'
 
 const MongoClient = require('mongodb').MongoClient
 
 // Connection URL
 const mongoUrl = process.env.MONGO_URL || 'mongodb://db:27017/test';
 
-var timesLoged = 0;
+function sendLine(res, message){
+  res.write(message + EOL);
+}
 
 http.createServer((req, res) => {
   // Use connect method to connect to the Server
@@ -16,17 +20,45 @@ http.createServer((req, res) => {
       res.end('BOOM: ' + err)
     } else {
       res.writeHead(200, {'Content-Type': 'text/plain'})
-      res.end('[ ' + timesLoged + ' ] segundos activo')
-      db.close();
+      sendLine(res, "server activo")
+      var dbo = db.db("alive");
+      var mysort = {date: -1};
+      dbo.collection("times").find().sort(mysort).limit(5).toArray(function(err, result) {
+        if (err) throw err;
+        result.forEach(element => {
+          console.log(element.date)
+          sendLine(res, 'timestamp: ' + element.date)
+        });
+        db.close();
+        res.end('Listo')
+      });
     }
   });
 }).listen(port, err => {
   console.log('Server listening at *:', port)
 });
 
+// Save active status
 
-function intervalFunc() {
-  timesLoged+=1;
+function saveActiveStatus() {
+  // Use connect method to connect to the Server
+  MongoClient.connect(mongoUrl, (err, db) => {
+    if (err) {
+      console.log("[ERROR #1]", err);
+    } else {
+      var dbo = db.db("alive");
+      var actualTimeAlive = { date: new Date()};
+      dbo.collection("times").insertOne(actualTimeAlive, function(err, res) {
+        if (err) {
+          console.log("[ERROR #2]", err);
+          db.close();
+        } else {
+          console.log("1 document inserted");
+          db.close();
+        }
+      })
+    }
+  });
 }
 
-setInterval(intervalFunc, 1000);
+setInterval(saveActiveStatus, INTERVAL);
