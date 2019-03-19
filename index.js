@@ -13,6 +13,7 @@ function sendLine(res, message){
 }
 
 http.createServer((req, res) => {
+  var start = new Date();
   // Use connect method to connect to the Server
   MongoClient.connect(mongoUrl, (err, db) => {
     if (err) {
@@ -30,7 +31,8 @@ http.createServer((req, res) => {
           sendLine(res, 'timestamp: ' + element.date)
         });
         db.close();
-        res.end('Listo')
+        var executeTake = new Date().getTime() - start.getTime()
+        res.end('Execution time: ' + executeTake + 'ms')
       });
     }
   });
