@@ -24,7 +24,7 @@ http.createServer((req, res) => {
       sendLine(res, "server activo")
       var dbo = db.db("alive");
       var mysort = {date: -1};
-      dbo.collection("times").find().sort(mysort).limit(5).toArray(function(err, result) {
+      dbo.collection("times").find().sort(mysort).limit(100).toArray(function(err, result) {
         if (err) throw err;
         result.forEach(element => {
           console.log(element.date)
